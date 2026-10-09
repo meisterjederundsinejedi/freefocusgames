@@ -4,8 +4,6 @@ import { cn } from "@/lib/utils";
 import { Layout } from "@/components/layout";
 import { ThemeProvider } from "next-themes";
 // import { headers } from "next/headers";
-import { GoogleAnalytics } from "@next/third-parties/google";
-import GoogleAdSense from "@/components/google-adsense";
 import { Toaster } from "@/components/ui/sonner";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
@@ -110,25 +108,6 @@ export default async function RootLayout({
                         __html: `window.__name = window.__name || function(f){return f;};`,
                     }}
                 />
-
-                {/* 结构化数据 */}
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "WebSite",
-                        name: "FreeFocusGames",
-                        url: "https://www.freefocusgames.com",
-                        description:
-                            "Free online platform with science-based games to improve focus, memory and concentration for kids, adults, and seniors",
-                        keywords:
-                            "free focus games, memory games, brain training, concentration games, focus games for kids, memory games for seniors",
-                        potentialAction: {
-                            "@type": "SearchAction",
-                            target: "https://www.freefocusgames.com/search?q={search_term_string}",
-                            "query-input": "required name=search_term_string",
-                        },
-                    })}
-                </script>
             </head>
             <body
                 className={cn(
@@ -141,7 +120,6 @@ export default async function RootLayout({
                         defaultTheme="system"
                         enableSystem
                     >
-                        <GoogleAdSense adClient={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID || ''} />
                         <Layout>
                             {children}
                         </Layout>
@@ -149,7 +127,6 @@ export default async function RootLayout({
                     </ThemeProvider>
                 </NextIntlClientProvider>
             </body>
-            <GoogleAnalytics gaId="G-93FVQFJCHE" />
         </html>
     );
 }
