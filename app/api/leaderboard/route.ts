@@ -465,7 +465,6 @@ export async function GET(req: NextRequest) {
         const gameId = searchParams.get("gameId");
         const aggregate = searchParams.get("aggregate");
         const mode = searchParams.get("mode") || DEFAULT_LEADERBOARD_MODE;
-        const view = searchParams.get("view");
 
         if (!gameId) {
             return NextResponse.json({ error: "Missing or invalid parameters" }, { status: 400 });
