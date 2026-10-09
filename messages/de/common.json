@@ -3,6 +3,20 @@
     "home": "Startseite",
     "games": "Spiele",
     "language": "Sprache",
-    "toggleTheme": "Helligkeit umschalten"
+    "toggleTheme": "Helligkeit umschalten",
+    "leaderboard": {
+      "title": "Deine besten Ergebnisse",
+      "empty": "Noch keine Ergebnisse. Spiel eine Runde, dann erscheint sie hier.",
+      "best": "Deine Bestleistung",
+      "unitPts": "Punkte",
+      "unitMs": "ms",
+      "unitSec": "Sek.",
+      "unitCps": "Klicks/Sek.",
+      "unitLevel": "Stufe {score}",
+      "unitPercent": " %",
+      "unitWahTurns": "{score} Wah-Drehungen",
+      "unitDigits": "{score} Ziffern",
+      "unitSteps": "{score} Schritte"
+    }
   }
 }

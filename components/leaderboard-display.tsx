@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import { Trophy, Users, TrendingUp, Sparkles } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { DEFAULT_LEADERBOARD_MODE } from "@/lib/leaderboard-config";
-import { getPublicLeaderboardUrl } from "@/lib/leaderboard-public";
-import { compareScores, hasTargetScore, isHigherScoreBetter } from "@/lib/leaderboard-snapshots";
+import { readLocalScores, type LocalScore } from "@/lib/leaderboard";
 
 export type FormatterType = 'ms' | 'sec3' | 'sec4' | 'cps' | 'pts' | 'levels' | 'steps' | 'digits' | 'schulte' | 'percent' | 'wahs' | 'default';
 export type LeaderboardDetailsType = 'double-decision';
@@ -14,101 +12,38 @@ export interface LeaderboardDisplayProps {
     gameId: string;
     formatterType?: FormatterType;
     mode?: string;
+    /** Kept so existing game pages compile; there are no details in the local list. */
     detailsType?: LeaderboardDetailsType;
 }
 
-type LeaderboardRecord = {
-    playerName: string;
-    score: number;
-    createdAt: string;
-    details?: Record<string, boolean | number | string | null>;
-};
+const SHOWN = 5;
 
-type LeaderboardApiResponse = {
-    top20?: LeaderboardRecord[];
-    averageScore?: number;
-    totalPlayers?: number;
-    entries?: Array<{
-        playerName: string;
-        score: number;
-        createdAt: string;
-        details?: Record<string, boolean | number | string | null>;
-    }>;
-    scoreSum?: number;
-};
-
-function normalizeLeaderboardResponse(data: LeaderboardApiResponse) {
-    const top20 = Array.isArray(data.top20)
-        ? data.top20
-        : Array.isArray(data.entries)
-            ? data.entries.map((entry) => ({
-                playerName: entry.playerName,
-                score: entry.score,
-                createdAt: entry.createdAt,
-                details: entry.details,
-            }))
-            : [];
-
-    const totalPlayers = typeof data.totalPlayers === "number" ? data.totalPlayers : top20.length;
-    const averageScore = typeof data.averageScore === "number"
-        ? data.averageScore
-        : typeof data.scoreSum === "number" && totalPlayers > 0
-            ? data.scoreSum / totalPlayers
-            : 0;
-
-    return {
-        top20,
-        averageScore,
-        totalPlayers,
-    };
-}
-
-function isLeaderboardDataConsistent(
-    gameId: string,
-    data: ReturnType<typeof normalizeLeaderboardResponse>
-) {
-    if (data.totalPlayers === 0 || data.top20.length === 0) {
-        return true;
-    }
-
-    for (let index = 1; index < data.top20.length; index += 1) {
-        if (compareScores(gameId, data.top20[index - 1].score, data.top20[index].score) > 0) {
-            return false;
-        }
-    }
-
-    if (hasTargetScore(gameId)) {
-        return true;
-    }
-
-    const bestScore = data.top20[0]?.score;
-    if (typeof bestScore !== "number") {
-        return true;
-    }
-
-    return isHigherScoreBetter(gameId)
-        ? data.averageScore <= bestScore
-        : data.averageScore >= bestScore;
-}
-
+/**
+ * "Your best results": the personal list of this device, best first.
+ * Reads localStorage only; nothing is sent anywhere.
+ */
 export function LeaderboardDisplay({
     gameId,
     formatterType = 'default',
     mode = DEFAULT_LEADERBOARD_MODE,
-    detailsType,
 }: LeaderboardDisplayProps) {
     const t = useTranslations('common.leaderboard');
-    const [top20, setTop20] = useState<LeaderboardRecord[]>([]);
-    const [averageScore, setAverageScore] = useState<number>(0);
-    const [totalPlayers, setTotalPlayers] = useState<number>(0);
-    const [loading, setLoading] = useState(false);
-    const [hasEnteredViewport, setHasEnteredViewport] = useState(false);
-    const [mySessionDetail, setMySessionDetail] = useState<{
-        playerName: string;
-        score: number;
-        details?: Record<string, boolean | number | string | null>;
-    } | null>(null);
-    const containerRef = useRef<HTMLDivElement | null>(null);
+    const locale = useLocale();
+    const [scores, setScores] = useState<LocalScore[] | null>(null);
+
+    const load = useCallback(() => setScores(readLocalScores(gameId, mode)), [gameId, mode]);
+
+    useEffect(() => {
+        load();
+        const onUpdate = (event: Event) => {
+            const detail = (event as CustomEvent<{ gameId?: string; mode?: string }>).detail;
+            if (!detail || (detail.gameId === gameId && (detail.mode ?? DEFAULT_LEADERBOARD_MODE) === mode)) {
+                load();
+            }
+        };
+        window.addEventListener('leaderboardUpdated', onUpdate);
+        return () => window.removeEventListener('leaderboardUpdated', onUpdate);
+    }, [gameId, mode, load]);
 
     const formatScore = useCallback((s: number) => {
         const rounded = Math.round(s);
@@ -128,254 +63,29 @@ export function LeaderboardDisplay({
         }
     }, [formatterType, t]);
 
-    const fetchLeaderboard = useCallback(async (forceFresh = false) => {
-        try {
-            setLoading(true);
-            const params = new URLSearchParams({ gameId, mode });
-            if (forceFresh) {
-                params.set("_", Date.now().toString());
-            }
-            const requestInit: RequestInit = {
-                cache: forceFresh ? "no-store" : "default",
-            };
-            const publicUrl = getPublicLeaderboardUrl(gameId, mode);
-            const publicRequestUrl = publicUrl
-                ? `${publicUrl}${forceFresh ? `?${params.toString()}` : ""}`
-                : null;
+    // Before the first read (and on the server) show nothing, so the layout does not jump.
+    if (scores === null) return null;
 
-            let res: Response | null = null;
-
-            if (publicRequestUrl) {
-                try {
-                    res = await fetch(publicRequestUrl, requestInit);
-                    if (res.ok) {
-                        const publicData = normalizeLeaderboardResponse((await res.json()) as LeaderboardApiResponse);
-                        if (isLeaderboardDataConsistent(gameId, publicData)) {
-                            setTop20(publicData.top20);
-                            setAverageScore(publicData.averageScore);
-                            setTotalPlayers(publicData.totalPlayers);
-                            return;
-                        }
-                    }
-                } catch {
-                    res = null;
-                }
-            }
-
-            res = await fetch(`/api/leaderboard?${params.toString()}`, {
-                cache: "no-store",
-            });
-
-            if (res.ok) {
-                const data = normalizeLeaderboardResponse((await res.json()) as LeaderboardApiResponse);
-                setTop20(data.top20);
-                setAverageScore(data.averageScore);
-                setTotalPlayers(data.totalPlayers);
-            }
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
-    }, [gameId, mode]);
-
-    useEffect(() => {
-        if (hasEnteredViewport) {
-            void fetchLeaderboard();
-        }
-    }, [fetchLeaderboard, hasEnteredViewport]);
-
-    useEffect(() => {
-        const node = containerRef.current;
-        if (!node || hasEnteredViewport) {
-            return;
-        }
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setHasEnteredViewport(true);
-                    observer.disconnect();
-                }
-            },
-            { rootMargin: "300px 0px" }
-        );
-
-        observer.observe(node);
-        return () => observer.disconnect();
-    }, [hasEnteredViewport]);
-
-    useEffect(() => {
-        const handleUpdate = (e: Event) => {
-            const customEvent = e as CustomEvent<{
-                details?: Record<string, boolean | number | string | null>;
-                gameId: string;
-                mode?: string;
-                playerName: string;
-                score: number;
-            }>;
-            if (customEvent.detail && customEvent.detail.gameId === gameId && (customEvent.detail.mode || DEFAULT_LEADERBOARD_MODE) === mode) {
-                setMySessionDetail({
-                    playerName: customEvent.detail.playerName,
-                    score: customEvent.detail.score,
-                    details: customEvent.detail.details,
-                });
-                setHasEnteredViewport(true);
-                void fetchLeaderboard(true);
-            }
-        };
-
-        window.addEventListener('leaderboardUpdated', handleUpdate);
-        return () => window.removeEventListener('leaderboardUpdated', handleUpdate);
-    }, [gameId, fetchLeaderboard, mode]);
-
-    if (!hasEnteredViewport) {
-        return (
-            <div ref={containerRef} className="w-full bg-background border rounded-xl overflow-hidden shadow-sm">
-                <div className="flex justify-center p-8 text-muted-foreground">
-                    {t('loadPrompt')}
-                </div>
-            </div>
-        );
-    }
-
-    if (loading) {
-        return (
-            <div ref={containerRef} className="w-full bg-background border rounded-xl overflow-hidden shadow-sm">
-                <div className="flex justify-center p-8 text-muted-foreground animate-pulse">
-                    {t('loading')}
-                </div>
-            </div>
-        );
+    if (scores.length === 0) {
+        return <p className="text-xl">{t('empty')}</p>;
     }
 
     return (
-        <div ref={containerRef} className="w-full bg-background border rounded-xl overflow-hidden shadow-sm">
-            {/* Header Stats */}
-            <div className="bg-muted p-4 md:p-6 border-b flex flex-col md:flex-row gap-4 items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <div className="bg-primary/10 p-2 rounded-full">
-                        <Trophy className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-lg leading-none">{t('title')}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">{t('subtitle')}</p>
-                    </div>
-                </div>
-
-                <div className="flex gap-4">
-                    <div className="flex items-center gap-2 bg-background px-3 py-2 rounded-lg border">
-                        <Users className="w-4 h-4 text-blue-500" />
-                        <div className="text-sm">
-                            <span className="font-semibold block">{totalPlayers}</span>
-                            <span className="text-muted-foreground text-xs">{t('totalPlayers')}</span>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2 bg-background px-3 py-2 rounded-lg border">
-                        <TrendingUp className="w-4 h-4 text-emerald-500" />
-                        <div className="text-sm">
-                            <span className="font-semibold block">{formatScore(averageScore)}</span>
-                            <span className="text-muted-foreground text-xs">{t((formatterType === 'steps' || formatterType === 'digits') ? 'averageSequenceLength' : 'averageScore')}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Current Player Status */}
-            {mySessionDetail && (
-                <div className="bg-emerald-500/10 border-b border-emerald-500/20 p-4 flex items-center gap-3">
-                    <Sparkles className="w-5 h-5 text-emerald-600" />
-                    <div>
-                        <p className="text-sm text-emerald-800 dark:text-emerald-300 font-medium">
-                            {t('submittedTitle')} <strong className="font-bold text-emerald-900 dark:text-emerald-100">{mySessionDetail.playerName}</strong>.
-                        </p>
-                        <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-0.5">
-                            {t('submittedBody', {
-                                score: formatScore(mySessionDetail.score),
-                                average: formatScore(averageScore),
-                            })}
-                        </p>
-                    </div>
-                </div>
-            )}
-
-            {/* Leaderboard Table */}
-            <div className="max-h-[400px] overflow-y-auto">
-                {top20.length === 0 ? (
-                    <div className="p-8 text-center text-muted-foreground">
-                        {t('empty')}
-                    </div>
-                ) : (
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/50 sticky top-0 backdrop-blur-sm z-10">
-                            <tr>
-                                <th className="text-left font-medium p-4 text-muted-foreground">{t('rank')}</th>
-                                <th className="text-left font-medium p-4 text-muted-foreground">{t('player')}</th>
-                                {detailsType === 'double-decision' && (
-                                    <>
-                                        <th className="hidden text-right font-medium p-4 text-muted-foreground sm:table-cell">
-                                            {t('accuracy')}
-                                        </th>
-                                        <th className="hidden text-right font-medium p-4 text-muted-foreground md:table-cell">
-                                            {t('field')}
-                                        </th>
-                                        <th className="hidden text-right font-medium p-4 text-muted-foreground lg:table-cell">
-                                            {t('fastestDisplay')}
-                                        </th>
-                                    </>
-                                )}
-                                <th className="text-right font-medium p-4 text-muted-foreground">{t((formatterType === 'steps' || formatterType === 'digits') ? 'sequenceLength' : 'score')}</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {top20.map((record, index) => {
-                                const isMe = mySessionDetail && record.playerName === mySessionDetail.playerName;
-                                const rank = formatterType === 'steps' || formatterType === 'digits'
-                                    ? top20.findIndex((entry) => compareScores(gameId, entry.score, record.score) === 0) + 1
-                                    : index + 1;
-                                return (
-                                    <tr
-                                        key={index}
-                                        className={`hover:bg-muted/50 transition-colors ${isMe ? 'bg-primary/5 dark:bg-primary/10' : ''}`}
-                                    >
-                                        <td className="p-4">
-                                            <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold bg-muted text-muted-foreground text-xs">
-                                                {rank}
-                                            </div>
-                                        </td>
-                                        <td className="p-4 font-medium flex items-center gap-2">
-                                            {record.playerName}
-                                            {isMe && <span className="text-[10px] uppercase bg-primary text-primary-foreground px-1.5 py-0.5 rounded-sm font-bold">{t('you')}</span>}
-                                        </td>
-                                        {detailsType === 'double-decision' && (
-                                            <>
-                                                <td className="hidden p-4 text-right font-mono sm:table-cell">
-                                                    {typeof record.details?.accuracy === 'number'
-                                                        ? `${record.details.accuracy}%`
-                                                        : '—'}
-                                                </td>
-                                                <td className="hidden p-4 text-right font-mono md:table-cell">
-                                                    {typeof record.details?.maxFieldLevel === 'number'
-                                                        ? record.details.maxFieldLevel
-                                                        : '—'}
-                                                </td>
-                                                <td className="hidden p-4 text-right font-mono lg:table-cell">
-                                                    {typeof record.details?.fastestDisplayMs === 'number'
-                                                        ? `${record.details.fastestDisplayMs} ${t('unitMs')}`
-                                                        : '—'}
-                                                </td>
-                                            </>
-                                        )}
-                                        <td className="p-4 text-right font-mono font-bold">
-                                            <div>{formatScore(record.score)}</div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                )}
-            </div>
-        </div>
+        <ol className="space-y-3">
+            {scores.slice(0, SHOWN).map((entry, index) => (
+                <li
+                    key={`${entry.at}-${index}`}
+                    className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 rounded-[var(--radius)] border-2 border-border bg-card px-5 py-3"
+                >
+                    <span className="text-[length:var(--text-button)] font-bold">
+                        {index + 1}. {formatScore(entry.score)}
+                        {index === 0 && <span className="ml-3 text-xl">· {t('best')}</span>}
+                    </span>
+                    <span className="text-lg text-muted-foreground">
+                        {new Date(entry.at).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </span>
+                </li>
+            ))}
+        </ol>
     );
 }

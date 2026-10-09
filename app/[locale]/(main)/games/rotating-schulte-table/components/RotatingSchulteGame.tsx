@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { ShareModal } from '@/components/ui/ShareModal'
-import { getLeaderboardPlayerId, submitScoreToLeaderboard } from '@/lib/leaderboard'
+import { submitScoreToLeaderboard } from '@/lib/leaderboard'
 import { ROTATING_SCHULTE_TOTAL_NUMBERS, ROTATING_SCHULTE_PENALTY_MS } from '@/lib/rotating-schulte-rules'
 import { RANKED_LEADERBOARD_MODE } from '@/lib/leaderboard-config'
 import { cn } from '@/lib/utils'
@@ -131,10 +131,6 @@ export function RotatingSchulteGame() {
   const [completedNumbers, setCompletedNumbers] = useState<Set<number>>(new Set())
   const [errorNumber, setErrorNumber] = useState<number | null>(null)
   const [showShareModal, setShowShareModal] = useState(false)
-  const [isStarting, setIsStarting] = useState(false)
-  const [rankedUnavailable, setRankedUnavailable] = useState(false)
-  const startingRef = useRef(false)
-  const sessionIdRef = useRef<string | null>(null)
   const clickTimesRef = useRef<number[]>([])
   const boardRef = useRef<HTMLDivElement>(null)
   const gameStateRef = useRef<GameState>('idle')
@@ -178,29 +174,8 @@ export function RotatingSchulteGame() {
     return () => window.clearInterval(timerId)
   }, [gameState])
 
-  const startGame = useCallback(async () => {
-    if (startingRef.current || gameStateRef.current === 'playing') return
-    startingRef.current = true
-    setIsStarting(true)
-    sessionIdRef.current = null
-    setRankedUnavailable(false)
-    try {
-      const response = await fetch('/api/leaderboard/rotating-schulte-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ playerId: getLeaderboardPlayerId() }),
-        signal: AbortSignal.timeout(10_000),
-      })
-      if (!response.ok) throw new Error('Ranked session unavailable')
-      const data = await response.json() as { sessionId: string }
-      if (!/^[a-f0-9]{32}$/.test(data.sessionId)) throw new Error('Invalid session')
-      sessionIdRef.current = data.sessionId
-    } catch {
-      setRankedUnavailable(true)
-    } finally {
-      startingRef.current = false
-      setIsStarting(false)
-    }
+  const startGame = useCallback(() => {
+    if (gameStateRef.current === 'playing') return
     clickTimesRef.current = []
     if (errorTimeoutRef.current !== null) window.clearTimeout(errorTimeoutRef.current)
 
@@ -254,18 +229,9 @@ export function RotatingSchulteGame() {
     updateGameState('complete')
     confetti({ particleCount: 120, spread: 72, origin: { y: 0.62 } })
 
-    if (sessionIdRef.current) {
-      void submitScoreToLeaderboard('rotating-schulte-table', adjustedTimeMs, {
-        mode: RANKED_LEADERBOARD_MODE,
-        details: {
-          sessionId: sessionIdRef.current,
-          rawTimeMs,
-          mistakes: mistakesRef.current,
-          clickTimes: JSON.stringify(clickTimesRef.current),
-        },
-      }).catch(() => undefined)
-      sessionIdRef.current = null
-    }
+    void submitScoreToLeaderboard('rotating-schulte-table', adjustedTimeMs, {
+      mode: RANKED_LEADERBOARD_MODE,
+    })
   }, [updateGameState])
 
   const handleSectorClick = useCallback((number: number) => {
@@ -314,7 +280,6 @@ export function RotatingSchulteGame() {
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-5" ref={boardRef}>
-      {rankedUnavailable && <p className="text-sm text-muted-foreground" role="status">{t('rankedUnavailable')}</p>}
       <div className="flex flex-wrap items-center justify-between gap-3 px-1 text-sm">
         <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
@@ -417,7 +382,7 @@ export function RotatingSchulteGame() {
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               {t('bestTime')}: {bestTimeLabel}
             </p>
-            <Button size="lg" onClick={startGame} disabled={isStarting} className="gap-2 rounded-full px-7">
+            <Button size="lg" onClick={startGame} className="gap-2 rounded-full px-7">
               <PlayCircle className="h-5 w-5" aria-hidden="true" />
               {t('startGame')}
             </Button>
@@ -437,7 +402,7 @@ export function RotatingSchulteGame() {
                 <p className="flex justify-between gap-4"><span>{t('mistakes')}</span><strong>{mistakes}</strong></p>
               </div>
               <div className="mt-6 flex gap-2">
-                <Button onClick={startGame} disabled={isStarting} className="flex-1 rounded-full">{t('playAgain')}</Button>
+                <Button onClick={startGame} className="flex-1 rounded-full">{t('playAgain')}</Button>
                 <Button variant="outline" onClick={() => setShowShareModal(true)} className="rounded-full">{t('share')}</Button>
               </div>
             </div>

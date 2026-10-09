@@ -1,6 +1,11 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import {
+    LeaderboardDisplay,
+    type FormatterType,
+    type LeaderboardDetailsType,
+} from "@/components/leaderboard-display";
 
 /**
  * The shared game shell. Every game page is shown through this component so that
@@ -24,7 +29,11 @@ interface GamePageTemplateProps {
     description?: React.ReactNode;
     gameComponent: React.ReactNode;
     howToPlay: React.ReactNode;
+    // Used for the "Your best results" list: hasLeaderboard, leaderboardMode,
+    // leaderboardFormatterType, leaderboardComponent (results are local only).
     // Ignored by the shell (kept so older game pages still compile):
+    leaderboardTitle?: React.ReactNode;
+    leaderboardIntro?: React.ReactNode;
     additionalContent?: React.ReactNode;
     shareActions?: React.ReactNode;
     benefits?: unknown;
@@ -33,11 +42,9 @@ interface GamePageTemplateProps {
     faq?: unknown;
     relatedGames?: string[];
     hasLeaderboard?: boolean;
-    leaderboardTitle?: React.ReactNode;
-    leaderboardFormatterType?: unknown;
-    leaderboardDetailsType?: unknown;
+    leaderboardFormatterType?: FormatterType;
+    leaderboardDetailsType?: LeaderboardDetailsType;
     leaderboardMode?: string;
-    leaderboardIntro?: React.ReactNode;
     leaderboardComponent?: React.ReactNode;
     structuredData?: unknown;
 }
@@ -47,10 +54,16 @@ export function GamePageTemplate({
     title,
     subtitle,
     description,
+    gameId,
     gameComponent,
     howToPlay,
+    hasLeaderboard,
+    leaderboardFormatterType,
+    leaderboardMode,
+    leaderboardComponent,
 }: GamePageTemplateProps) {
     const t = useTranslations("games.template");
+    const scoresT = useTranslations("common.leaderboard");
 
     return (
         <div className="space-y-8">
@@ -79,6 +92,21 @@ export function GamePageTemplate({
             >
                 {gameComponent}
             </section>
+
+            {(hasLeaderboard || leaderboardComponent) && (
+                <section aria-labelledby="scores-heading" className="space-y-4">
+                    <h2 id="scores-heading" className="text-[length:var(--text-heading)] font-bold">
+                        {scoresT("title")}
+                    </h2>
+                    {leaderboardComponent ?? (
+                        <LeaderboardDisplay
+                            gameId={gameId}
+                            formatterType={leaderboardFormatterType}
+                            mode={leaderboardMode}
+                        />
+                    )}
+                </section>
+            )}
         </div>
     );
 }
