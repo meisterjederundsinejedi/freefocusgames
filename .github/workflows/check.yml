@@ -24,6 +24,15 @@ jobs:
           npm run build > /tmp/report/build.txt 2>&1; echo $? > /tmp/report/build.code
           echo "$GITHUB_SHA" > /tmp/report/sha.txt
           exit 0
+      - name: Screenshots of the built app
+        continue-on-error: true
+        run: |
+          test "$(cat /tmp/report/build.code)" = "0" || exit 0
+          npm install --no-save --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+          npx next start -p 3000 > /tmp/report/server.txt 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:3000/ > /dev/null && break; sleep 1; done
+          node .github/screenshots.mjs > /tmp/report/screenshots.txt 2>&1
       - name: Publish report to ci-report branch
         run: |
           cd /tmp/report
