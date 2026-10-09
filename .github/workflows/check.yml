@@ -3,6 +3,8 @@ on:
   push:
     branches: [mamahjong-base, main]
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -11,12 +13,26 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
       - run: npm install --no-audit --no-fund
-      - name: Typecheck
-        run: npx tsc --noEmit
-      - name: Lint
-        run: npx next lint
-        continue-on-error: true
-      - name: Build
-        run: npm run build
+      - name: Run checks
+        run: |
+          mkdir -p /tmp/report
+          set +e
+          npx tsc --noEmit > /tmp/report/typecheck.txt 2>&1; echo $? > /tmp/report/typecheck.code
+          npx next lint > /tmp/report/lint.txt 2>&1; echo $? > /tmp/report/lint.code
+          npm run build > /tmp/report/build.txt 2>&1; echo $? > /tmp/report/build.code
+          echo "$GITHUB_SHA" > /tmp/report/sha.txt
+          exit 0
+      - name: Publish report to ci-report branch
+        run: |
+          cd /tmp/report
+          git init -q -b ci-report
+          git config user.name "ci"
+          git config user.email "ci@users.noreply.github.com"
+          git add -A
+          git commit -q -m "report for $GITHUB_SHA"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" ci-report
+      - name: Fail if typecheck or build failed
+        run: |
+          test "$(cat /tmp/report/typecheck.code)" = "0"
+          test "$(cat /tmp/report/build.code)" = "0"
