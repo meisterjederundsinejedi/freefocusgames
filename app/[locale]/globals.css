@@ -141,6 +141,43 @@
   }
 }
 
+/*
+  Settings chosen by Mama (see lib/settings.ts). The attributes are set on <html>
+  before the first paint, so these rules apply from the very first frame.
+*/
+@layer base {
+  /* Text size: 1rem is 20px normally, 24px for "large", 28px for "very large". */
+  html[data-text="large"] {
+    font-size: 150%;
+  }
+  html[data-text="xlarge"] {
+    font-size: 175%;
+  }
+
+  /* High contrast: pure white and black, dark borders, the strongest blue. */
+  html[data-contrast="high"] {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 220 100% 16%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 10%;
+    --accent: 0 0% 88%;
+    --accent-foreground: 0 0% 0%;
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
+    --ring: 220 100% 30%;
+    --destructive: 0 100% 28%;
+    --success: 142 100% 16%;
+  }
+}
+
 /* Shared building blocks used by every game */
 @utility btn-big {
   min-height: var(--target-min);

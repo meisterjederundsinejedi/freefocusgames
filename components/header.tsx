@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { routing } from "@/i18n/routing";
+import { SettingsDialog } from "@/components/SettingsDialog";
 
 const LANGUAGE_NAMES: Record<string, string> = {
   de: "Deutsch",
@@ -31,19 +32,22 @@ export function Header() {
           </Link>
         </Button>
 
-        <nav aria-label={t("language")} className="flex items-center gap-3">
-          <span className="text-muted-foreground">{t("language")}:</span>
-          {routing.locales.map((code) => (
-            <Button
-              key={code}
-              variant={code === locale ? "default" : "outline"}
-              aria-pressed={code === locale}
-              onClick={() => router.replace(pathname, { locale: code })}
-            >
-              {LANGUAGE_NAMES[code] ?? code}
-            </Button>
-          ))}
-        </nav>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <nav aria-label={t("language")} className="flex items-center gap-3">
+            <span className="text-muted-foreground">{t("language")}:</span>
+            {routing.locales.map((code) => (
+              <Button
+                key={code}
+                variant={code === locale ? "default" : "outline"}
+                aria-pressed={code === locale}
+                onClick={() => router.replace(pathname, { locale: code })}
+              >
+                {LANGUAGE_NAMES[code] ?? code}
+              </Button>
+            ))}
+          </nav>
+          <SettingsDialog />
+        </div>
       </div>
     </header>
   );

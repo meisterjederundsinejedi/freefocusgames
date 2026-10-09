@@ -63,6 +63,28 @@
       "correctResponses": "Correct responses",
       "standardMode": "Standard dual mode",
       "customSession": "Custom session"
+    },
+    "settings": {
+      "open": "Settings",
+      "title": "Settings",
+      "saved": "Your choices are saved.",
+      "done": "Done",
+      "textSize": {
+        "label": "Text size",
+        "normal": "Normal",
+        "large": "Large",
+        "xlarge": "Very large"
+      },
+      "contrast": {
+        "label": "Contrast",
+        "normal": "Normal",
+        "high": "High"
+      },
+      "sound": {
+        "label": "Sound",
+        "on": "On",
+        "off": "Off"
+      }
     }
   }
 }

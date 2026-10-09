@@ -17,6 +17,28 @@
       "unitWahTurns": "{score} Wah-Drehungen",
       "unitDigits": "{score} Ziffern",
       "unitSteps": "{score} Schritte"
+    },
+    "settings": {
+      "open": "Einstellungen",
+      "title": "Einstellungen",
+      "saved": "Deine Auswahl bleibt gespeichert.",
+      "done": "Fertig",
+      "textSize": {
+        "label": "Schriftgröße",
+        "normal": "Normal",
+        "large": "Groß",
+        "xlarge": "Sehr groß"
+      },
+      "contrast": {
+        "label": "Kontrast",
+        "normal": "Normal",
+        "high": "Hoch"
+      },
+      "sound": {
+        "label": "Ton",
+        "on": "An",
+        "off": "Aus"
+      }
     }
   }
 }

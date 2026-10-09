@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "../globals.css";
 import { cn } from "@/lib/utils";
 import { Layout } from "@/components/layout";
+import { SettingsProvider } from "@/components/SettingsProvider";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { EARLY_SETTINGS_SCRIPT } from "@/lib/settings";
 import { ThemeProvider } from "next-themes";
 import { Atkinson_Hyperlegible } from "next/font/google";
 // import { headers } from "next/headers";
@@ -43,6 +46,12 @@ export async function generateMetadata(
         // A private collection: keep it out of search engines.
         robots: { index: false, follow: false },
         applicationName: 'MamahJong',
+        // Lets Chrome offer "Install" so the collection can be pinned to the shelf.
+        manifest: '/manifest.webmanifest',
+        icons: {
+            icon: [{ url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+            apple: '/icons/apple-touch-icon.png',
+        },
         appleWebApp: {
             capable: true,
             title: 'MamahJong',
@@ -85,6 +94,9 @@ export default async function RootLayout({
                 {/* Windows */}
                 <meta name="msapplication-TileColor" content="#f9f6ef" />
 
+                {/* Text size and contrast from the settings, applied before the first paint */}
+                <script dangerouslySetInnerHTML={{ __html: EARLY_SETTINGS_SCRIPT }} />
+
                 {/* Polyfill for esbuild's keepNames/minification artifact in injected scripts */}
                 <script
                     dangerouslySetInnerHTML={{
@@ -104,10 +116,13 @@ export default async function RootLayout({
                         defaultTheme="light"
                         enableSystem={false}
                     >
-                        <Layout>
-                            {children}
-                        </Layout>
-                        <Toaster />
+                        <SettingsProvider>
+                            <Layout>
+                                {children}
+                            </Layout>
+                            <Toaster />
+                            <ServiceWorkerRegister />
+                        </SettingsProvider>
                     </ThemeProvider>
                 </NextIntlClientProvider>
             </body>
