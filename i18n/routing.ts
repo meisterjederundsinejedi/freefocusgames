@@ -1,17 +1,15 @@
 import { defineRouting } from "next-intl/routing";
 
 export const routing = defineRouting({
-    // A list of all locales that are supported
-    locales: ["en", "zh"],
+    // German is Mama's language; English stays available.
+    locales: ["de", "en"],
 
     // Used when no locale matches
-    defaultLocale: "en",
+    defaultLocale: "de",
 
-    // Default locale doesn't need prefix
+    // The default language needs no URL prefix (/ instead of /de)
     localePrefix: "as-needed",
-    // A public URL always serves the same language; the switcher changes the URL.
+    // A URL always serves the same language; the switcher changes the URL.
     localeDetection: false,
-    // Page metadata and sitemap know which translations actually exist.
     alternateLinks: false,
 });
-

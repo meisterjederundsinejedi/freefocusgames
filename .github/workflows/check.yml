@@ -17,6 +17,7 @@ jobs:
       - name: Run checks
         run: |
           mkdir -p /tmp/report
+          npm run generate-i18n
           set +e
           npx tsc --noEmit > /tmp/report/typecheck.txt 2>&1; echo $? > /tmp/report/typecheck.code
           npx next lint > /tmp/report/lint.txt 2>&1; echo $? > /tmp/report/lint.code

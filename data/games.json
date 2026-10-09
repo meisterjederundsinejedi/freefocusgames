@@ -1,0 +1,293 @@
+{
+  "_comment": "Game registry. One entry per game; the home screen reads this file. Set enabled:false to hide a game without deleting it. type 'native' = React page in the app under /games/<slug>; type 'iframe' = standalone folder in public/games/<id>/ (use path). Bump version when a game is updated. Save data is keyed by id.",
+  "games": [
+    {
+      "id": "memory-matching-game",
+      "version": "1.0.0",
+      "title": {
+        "de": "Memory",
+        "en": "Memory"
+      },
+      "description": {
+        "de": "Finde die passenden Paare.",
+        "en": "Find the matching pairs."
+      },
+      "thumbnail": "/games/memory-matching-game-cover.png",
+      "type": "native",
+      "path": "/games/memory-matching-game",
+      "enabled": true
+    },
+    {
+      "id": "baby-animal-matching",
+      "version": "1.0.0",
+      "title": {
+        "de": "Tierbabys",
+        "en": "Baby Animals"
+      },
+      "description": {
+        "de": "Finde die Tierbaby-Paare.",
+        "en": "Find the baby animal pairs."
+      },
+      "thumbnail": "/games/baby-animal-matching-cover.png",
+      "type": "native",
+      "path": "/games/baby-animal-matching",
+      "enabled": true
+    },
+    {
+      "id": "focus-sudoku",
+      "version": "1.0.0",
+      "title": {
+        "de": "Sudoku",
+        "en": "Sudoku"
+      },
+      "description": {
+        "de": "Fülle das Zahlenrätsel in Ruhe aus.",
+        "en": "Fill in the number puzzle at your own pace."
+      },
+      "thumbnail": "/games/focus-sudoku-cover.png",
+      "type": "native",
+      "path": "/games/focus-sudoku",
+      "enabled": true
+    },
+    {
+      "id": "block-memory-challenge",
+      "version": "1.0.0",
+      "title": {
+        "de": "Blöcke merken",
+        "en": "Block Memory"
+      },
+      "description": {
+        "de": "Merke dir, welche Blöcke leuchten.",
+        "en": "Remember which blocks light up."
+      },
+      "thumbnail": "/games/block-memory-challenge-cover.png",
+      "type": "native",
+      "path": "/games/block-memory-challenge",
+      "enabled": true
+    },
+    {
+      "id": "schulte-table",
+      "version": "1.0.0",
+      "title": {
+        "de": "Zahlensuche",
+        "en": "Number Search"
+      },
+      "description": {
+        "de": "Tippe die Zahlen der Reihe nach an.",
+        "en": "Tap the numbers in order."
+      },
+      "thumbnail": "/games/schulte-table-cover.png",
+      "type": "native",
+      "path": "/games/schulte-table",
+      "enabled": true
+    },
+    {
+      "id": "trail-making-test",
+      "version": "1.0.0",
+      "title": {
+        "de": "Zahlen verbinden",
+        "en": "Connect the Numbers"
+      },
+      "description": {
+        "de": "Verbinde Zahlen und Buchstaben der Reihe nach.",
+        "en": "Connect numbers and letters in order."
+      },
+      "thumbnail": "/games/trail-making-test-cover-v2.png",
+      "type": "native",
+      "path": "/games/trail-making-test",
+      "enabled": true
+    },
+    {
+      "id": "larger-number",
+      "version": "1.0.0",
+      "title": {
+        "de": "Welche Zahl ist größer?",
+        "en": "Which Number Is Larger?"
+      },
+      "description": {
+        "de": "Tippe auf die größere Zahl.",
+        "en": "Tap the larger number."
+      },
+      "thumbnail": "/games/larger-number-cover.png",
+      "type": "native",
+      "path": "/games/larger-number",
+      "enabled": true
+    },
+    {
+      "id": "frog-memory-leap",
+      "version": "1.0.0",
+      "title": {
+        "de": "Froschsprung",
+        "en": "Frog Leap"
+      },
+      "description": {
+        "de": "Merke dir den Weg des Frosches.",
+        "en": "Remember the frog's path."
+      },
+      "thumbnail": "/games/frog-memory-leap-cover.png",
+      "type": "native",
+      "path": "/games/frog-memory-leap",
+      "enabled": true
+    },
+    {
+      "id": "stroop-effect-test",
+      "version": "1.0.0",
+      "title": {
+        "de": "Farben-Wörter",
+        "en": "Color Words"
+      },
+      "description": {
+        "de": "Wähle die Farbe, nicht das Wort.",
+        "en": "Pick the color, not the word."
+      },
+      "thumbnail": "/games/stroop-effect-cover.png",
+      "type": "native",
+      "path": "/games/stroop-effect-test",
+      "enabled": false
+    },
+    {
+      "id": "digit-span-test",
+      "version": "1.0.0",
+      "title": {
+        "de": "Zahlen merken",
+        "en": "Remember Digits"
+      },
+      "description": {
+        "de": "Merke dir eine Zahlenreihe.",
+        "en": "Remember a row of digits."
+      },
+      "thumbnail": "/games/digit-span-test-cover-v2.png",
+      "type": "native",
+      "path": "/games/digit-span-test",
+      "enabled": false
+    },
+    {
+      "id": "free-short-term-memory-test",
+      "version": "1.0.0",
+      "title": {
+        "de": "Kurzzeitgedächtnis",
+        "en": "Short-Term Memory"
+      },
+      "description": {
+        "de": "Merke dir Wörter und gib sie wieder.",
+        "en": "Remember words and recall them."
+      },
+      "thumbnail": "/games/free-short-term-memory-test.png",
+      "type": "native",
+      "path": "/games/free-short-term-memory-test",
+      "enabled": false
+    },
+    {
+      "id": "rotating-schulte-table",
+      "version": "1.0.0",
+      "title": {
+        "de": "Drehende Zahlensuche",
+        "en": "Rotating Number Search"
+      },
+      "description": {
+        "de": "Zahlensuche mit drehendem Feld.",
+        "en": "Number search on a rotating board."
+      },
+      "thumbnail": "/games/rotating-schulte-table.png",
+      "type": "native",
+      "path": "/games/rotating-schulte-table",
+      "enabled": false
+    },
+    {
+      "id": "bamboo-cicada",
+      "version": "1.0.0",
+      "title": {
+        "de": "Bambus-Zikade",
+        "en": "Bamboo Cicada"
+      },
+      "description": {
+        "de": "Ein ruhiges Geschicklichkeitsspiel.",
+        "en": "A calm game of skill."
+      },
+      "thumbnail": "/games/bamboo-cicada-cover.png",
+      "type": "native",
+      "path": "/games/bamboo-cicada",
+      "enabled": false
+    },
+    {
+      "id": "fish-trace",
+      "version": "1.0.0",
+      "title": {
+        "de": "Leuchtender Fisch",
+        "en": "Glowing Fish"
+      },
+      "description": {
+        "de": "Folge dem leuchtenden Fisch.",
+        "en": "Follow the glowing fish."
+      },
+      "thumbnail": "/games/fish-trace-cover.png",
+      "type": "native",
+      "path": "/games/fish-trace",
+      "enabled": false
+    },
+    {
+      "id": "double-decision",
+      "version": "1.0.0",
+      "title": {
+        "de": "Doppelte Entscheidung",
+        "en": "Double Decision"
+      },
+      "description": {
+        "de": "Schnelles Reaktionsspiel (erst testen).",
+        "en": "Fast reaction game (test first)."
+      },
+      "thumbnail": "/games/double-decision-cover.png",
+      "type": "native",
+      "path": "/games/double-decision",
+      "enabled": false
+    },
+    {
+      "id": "reaction-time",
+      "version": "1.0.0",
+      "title": {
+        "de": "Reaktionszeit",
+        "en": "Reaction Time"
+      },
+      "description": {
+        "de": "Wie schnell reagierst du?",
+        "en": "How fast do you react?"
+      },
+      "thumbnail": "/games/reaction-time.png",
+      "type": "native",
+      "path": "/games/reaction-time",
+      "enabled": false
+    },
+    {
+      "id": "focus-reaction-test",
+      "version": "1.0.0",
+      "title": {
+        "de": "Reaktionstest",
+        "en": "Reaction Test"
+      },
+      "description": {
+        "de": "Reagiere, wenn es sich ändert.",
+        "en": "React when it changes."
+      },
+      "thumbnail": "/games/focus-reaction-test.png",
+      "type": "native",
+      "path": "/games/focus-reaction-test",
+      "enabled": false
+    },
+    {
+      "id": "challenge-10-seconds",
+      "version": "1.0.0",
+      "title": {
+        "de": "10 Sekunden",
+        "en": "10 Seconds"
+      },
+      "description": {
+        "de": "Schätze zehn Sekunden.",
+        "en": "Estimate ten seconds."
+      },
+      "thumbnail": "/games/challenge-10-seconds.png",
+      "type": "native",
+      "path": "/games/challenge-10-seconds",
+      "enabled": false
+    }
+  ]
+}

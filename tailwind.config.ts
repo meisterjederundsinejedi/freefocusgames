@@ -80,7 +80,7 @@ export default {
   		},
   		fontFamily: {
   			sans: [
-  				'var(--font-inter)',
+  				'var(--font-atkinson)',
                     ...(defaultTheme.fontFamily?.sans || []),
                 ]
   		},

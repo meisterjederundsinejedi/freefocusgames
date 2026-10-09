@@ -5,8 +5,8 @@ import { routing } from "./routing";
 const messageCache = new Map<string, Record<string, unknown>>();
 
 const COMPILED_MESSAGES = {
+    de: () => import("../messages/de/compiled.json"),
     en: () => import("../messages/en/compiled.json"),
-    zh: () => import("../messages/zh/compiled.json"),
 } as const;
 
 async function loadMessages(locale: string) {

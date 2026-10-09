@@ -3,65 +3,49 @@ import "../globals.css";
 import { cn } from "@/lib/utils";
 import { Layout } from "@/components/layout";
 import { ThemeProvider } from "next-themes";
+import { Atkinson_Hyperlegible } from "next/font/google";
 // import { headers } from "next/headers";
 import { Toaster } from "@/components/ui/sonner";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { SITE_BASE_URL } from "@/lib/site-constants";
 import { getTranslations, getMessages, setRequestLocale } from 'next-intl/server';
 
+// Atkinson Hyperlegible: free (OFL), designed for low-vision readers.
+// next/font downloads it at build time and serves it from our own site,
+// so it also works offline.
+const atkinson = Atkinson_Hyperlegible({
+    weight: ["400", "700"],
+    subsets: ["latin", "latin-ext"],
+    display: "swap",
+    variable: "--font-atkinson",
+});
+
 export const dynamic = "force-static";
-export const revalidate = 86400;
 
 // Generate static params for all locales
 export function generateStaticParams() {
     return routing.locales.map((locale) => ({ locale }));
 }
 
-// 定义默认元数据，可以被页面级元数据覆盖
 export async function generateMetadata(
     { params }: { params: Promise<{ locale: string }> }
 ): Promise<Metadata> {
-    // 确保 params 是已解析的对象
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: 'metadata' });
 
-    // 获取当前URL的基本部分（不包含locale）
-    const baseUrl = SITE_BASE_URL;
-
     return {
-        // 网站级别的默认元数据
-        metadataBase: new URL(baseUrl),
-        // 默认标题模板，页面可以提供具体标题
         title: {
-            template: '%s | FreeFocusGames',
+            template: '%s | MamahJong',
             default: t('title'),
         },
-        // 默认描述，页面可以提供更具体的描述
         description: t('description'),
-        // 通用关键词，页面可以添加特定关键词
-        keywords: t('keywords').split(',').map(keyword => keyword.trim()),
-        // 默认 Open Graph 配置
-        openGraph: {
-            images: "/og/oglogo.png",
-            siteName: "FreeFocusGames",
-            type: "website",
-        },
-        // 默认 Twitter 配置
-        twitter: {
-            card: 'summary_large_image',
-        },
-        // 其他通用配置
-        robots: {
-            index: process.env.SITE_INDEXABLE !== "false",
-            follow: true,
-        },
-        authors: [{ name: 'FreeFocusGames Team' }],
-        applicationName: 'Focus Games',
+        // A private collection: keep it out of search engines.
+        robots: { index: false, follow: false },
+        applicationName: 'MamahJong',
         appleWebApp: {
             capable: true,
-            title: 'Focus Games',
+            title: 'MamahJong',
             statusBarStyle: 'default',
         },
     };
@@ -72,8 +56,7 @@ export const generateViewport = (): Viewport => {
     return {
         width: 'device-width',
         initialScale: 1,
-        maximumScale: 1,
-        userScalable: false,
+        // Never block zooming: some people need it.
     };
 };
 
@@ -98,9 +81,9 @@ export default async function RootLayout({
             <head>
                 <meta charSet="utf-8" />
                 {/* PWA primary color */}
-                <meta name="theme-color" content="#ffffff" />
+                <meta name="theme-color" content="#f9f6ef" />
                 {/* Windows */}
-                <meta name="msapplication-TileColor" content="#ffffff" />
+                <meta name="msapplication-TileColor" content="#f9f6ef" />
 
                 {/* Polyfill for esbuild's keepNames/minification artifact in injected scripts */}
                 <script
@@ -111,14 +94,15 @@ export default async function RootLayout({
             </head>
             <body
                 className={cn(
+                    atkinson.variable,
                     "min-h-screen bg-background font-sans antialiased"
                 )}
             >
                 <NextIntlClientProvider locale={locale} messages={messages}>
                     <ThemeProvider
                         attribute="class"
-                        defaultTheme="system"
-                        enableSystem
+                        defaultTheme="light"
+                        enableSystem={false}
                     >
                         <Layout>
                             {children}

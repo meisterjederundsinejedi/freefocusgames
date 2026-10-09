@@ -1,5 +1,3 @@
-import { CountingBoxesGamePreview } from "@/app/[locale]/(main)/games/counting-boxes/components/GamePreview";
-import { GamePreview as ResonanceBreathingPreview } from "@/app/[locale]/(main)/games/resonance-breathing/GamePreview";
 import { ImagePreview } from "@/components/image-preview";
 
 
@@ -35,51 +33,6 @@ export const games: Game[] = [
       />
     ),
     categories: ["working-memory"],
-  },
-  {
-    id: "resonance-breathing",
-    title: "Resonance Breathing",
-    slug: "resonance-breathing",
-    coverImage: "/games/resonance-breathing-person-cover.png",
-    preview: <ResonanceBreathingPreview />,
-    categories: ["sustained-attention", "relaxation"],
-  },
-  {
-    id: "box-breathing",
-    title: "Box Breathing",
-    slug: "box-breathing",
-    coverImage: "/games/box-breathing-cover.png",
-    preview: <ResonanceBreathingPreview />,
-    categories: ["relaxation", "sustained-attention"],
-  },
-  {
-    id: "478-breathing",
-    title: "4-7-8 Breathing",
-    slug: "478-breathing",
-    coverImage: "/games/478-breathing-cover.png",
-    preview: <ResonanceBreathingPreview />,
-    categories: ["relaxation"],
-  },
-  {
-    id: "pomodoro-timer",
-    title: "Pomodoro Timer",
-    slug: "pomodoro-timer",
-    coverImage: "/games/pomodoro-timer-cover.png",
-    preview: (
-      <ImagePreview
-        src="/games/pomodoro-timer-cover.png"
-        alt="Pomodoro Timer preview"
-        fit="cover"
-      />
-    ),
-    categories: ["sustained-attention"],
-  },
-  {
-    id: "counting-boxes",
-    title: "Counting Boxes",
-    slug: "counting-boxes",
-    preview: <CountingBoxesGamePreview />,
-    categories: ["working-memory", "spatial-memory", "brain-games-for-kids"],
   },
   {
     id: "free-short-term-memory-test",
@@ -140,20 +93,6 @@ export const games: Game[] = [
     categories: ["working-memory", "visual-tracking", "sustained-attention", "adhd-games"],
   },
   {
-    id: "dual-n-back",
-    title: "Dual N-Back",
-    slug: "dual-n-back",
-    coverImage: "/games/dual-n-back-cover.png",
-    preview: (
-      <ImagePreview
-        src="/games/dual-n-back-cover.png"
-        alt="Dual N-Back game preview"
-        fit="cover"
-      />
-    ),
-    categories: ["working-memory", "divided-attention", "adhd-games"],
-  },
-  {
     id: "double-decision",
     title: "Double Decision Game",
     slug: "double-decision",
@@ -208,19 +147,6 @@ export const games: Game[] = [
       />
     ),
     categories: ["reaction-time", "selective-attention", "brain-games-for-kids"],
-  },
-  {
-    id: "mahjong-dual-n-back",
-    title: "Mahjong Dual N-Back",
-    slug: "mahjong-dual-n-back",
-    coverImage: "/games/mahjong-dual-n-back.png",
-    preview: <ImagePreview src="/games/mahjong-dual-n-back.png" />,
-    categories: [
-      "working-memory",
-      "divided-attention",
-      "cognitive-flexibility",
-      "adhd-games",
-    ],
   },
   {
     id: "block-memory-challenge",
@@ -331,56 +257,6 @@ export const games: Game[] = [
     ],
   },
 
-  {
-    id: "cps-test",
-    title: "CPS Test",
-    slug: "cps-test",
-    coverImage: "/games/cps-test-cover.png",
-    preview: (
-      <ImagePreview
-        src="/games/cps-test-cover.png"
-        alt="CPS Test preview"
-        fit="cover"
-      />
-    ),
-    categories: [
-      "reaction-time",
-      "brain-games-for-kids",
-    ],
-  },
-  {
-    id: "spacebar-clicker",
-    title: "Spacebar Clicker Test",
-    slug: "spacebar-clicker",
-    coverImage: "/games/spacebar-clicker-cover.png",
-    preview: (
-      <ImagePreview
-        src="/games/spacebar-clicker-cover.png"
-        alt="Spacebar Clicker Test preview"
-        fit="cover"
-      />
-    ),
-    categories: [
-      "reaction-time",
-      "sustained-attention",
-    ],
-  },
-  {
-    id: "sbti-test",
-    title: "SBTI Personality Test",
-    slug: "sbti-test",
-    coverImage: "/games/sbti-test-cover.png",
-    preview: (
-      <ImagePreview
-        src="/games/sbti-test-cover.png"
-        alt="SBTI preview"
-        fit="cover"
-      />
-    ),
-    categories: [
-      "personality-tests",
-    ],
-  },
 
   // Add more games as you create them
 ];

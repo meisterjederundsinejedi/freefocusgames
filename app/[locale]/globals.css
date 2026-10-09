@@ -3,137 +3,158 @@
 @config '../../tailwind.config.ts';
 
 /*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+  MamahJong design tokens
+  -----------------------
+  One place for the look of the whole collection. Every game uses these, so a
+  change here changes everything at once.
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
+  Rules (see project instructions):
+  - Body text at least 20px, headings and buttons 28px or more.
+  - Contrast at least WCAG AA, aiming for AAA. Colour never carries meaning alone.
+  - Buttons at least 60x60px. Calm visuals, no flashing.
 */
+
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: hsl(var(--border));
   }
-}
 
-/* Custom utilities */
-@utility text-gradient {
-  @apply bg-linear-to-r from-[hsl(var(--primary))] via-[hsl(var(--foreground))] to-[hsl(var(--accent))] bg-clip-text text-transparent;
-}
-@utility btn-destructive {
-  @apply bg-[hsl(var(--destructive))] text-[hsl(var(--foreground))];
-}
-@utility btn-success {
-  @apply bg-[hsl(var(--success))] text-[hsl(var(--foreground))];
-}
+  /* 1rem = 20px, so Tailwind's text-base is 20px and nothing "normal" is smaller. */
+  html {
+    font-size: 125%;
+    -webkit-text-size-adjust: 100%;
+  }
 
-@layer utilities {
   body {
-    font-family: Arial, Helvetica, sans-serif;
+    @apply bg-background text-foreground font-sans;
+    line-height: 1.6;
   }
-}
 
-@layer base {
+  h1, h2, h3 {
+    line-height: 1.25;
+  }
+
+  /* A clear, thick focus outline for keyboard and screen-reader users. */
+  :focus-visible {
+    outline: 4px solid hsl(var(--ring));
+    outline-offset: 3px;
+  }
+
+  /* Calm visuals: respect the system "reduce motion" setting. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   :root {
-    /* 核心颜色 */
-    --background: 0 0% 100%; /* 白色 */
-    --foreground: 0 0% 0%;    /* 黑色 */
+    /* Surfaces: a warm off-white is calmer than pure white. */
+    --background: 42 40% 97%;
+    --foreground: 222 30% 10%;          /* about 15:1 on the background */
+    --card: 0 0% 100%;
+    --card-foreground: 222 30% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 30% 10%;
 
-    /* 边框和输入框 */
-    --border: 0 0% 90%;      /* 浅灰色边框 */
-    --input: 0 0% 90%;       /* 浅灰色输入框 */
+    /* Main action colour: deep blue with white text (about 10:1). */
+    --primary: 215 85% 28%;
+    --primary-foreground: 0 0% 100%;
 
-    /* 主要颜色 - 改为黑色 */
-    --primary: 0 0% 0%;      /* 黑色 */
-    --primary-foreground: 0 0% 100%; /* 白色 */
+    --secondary: 42 30% 90%;
+    --secondary-foreground: 222 30% 10%;
+    --muted: 42 25% 92%;
+    --muted-foreground: 220 15% 28%;    /* about 9:1, still readable for small text */
+    --accent: 42 35% 88%;
+    --accent-foreground: 222 30% 10%;
 
-    /* 辅助色和柔和色 */
-    --secondary: 0 0% 96%;   /* 更深的浅灰色 */
-    --secondary-foreground: 0 0% 0%;
-    --muted: 0 0% 98%;       /* 浅灰色 */
-    --muted-foreground: 0 0% 35%; /* 深灰色以提高对比度 */
-    --accent: 0 0% 95%;      /* 更浅的灰色悬停背景 */
-    --accent-foreground: 0 0% 0%;
+    /* Borders must be visible (3:1) so that buttons look like buttons. */
+    --border: 220 10% 48%;
+    --input: 220 10% 48%;
+    --ring: 215 90% 40%;
+    --radius: 1rem;
 
-    /* 其他 */
-    --radius: 0.5rem;
-    --ring: 0 0% 0%;         /* 黑色 */
+    /* Status colours are always paired with words or icons, never colour alone. */
+    --destructive: 0 70% 38%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 70% 22%;
+    --success-foreground: 0 0% 100%;
 
-    /* 侧边栏样式 */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 0 0% 0%;  /* 改为黑色 */
+    /* Sizes used by shared components */
+    --target-min: 60px;                  /* smallest clickable area */
+    --text-button: 1.4rem;               /* 28px */
+    --text-heading: 1.4rem;              /* 28px, h-levels scale up from here */
 
-    /* 状态颜色 */
-    --destructive: 0 84.2% 60.2%; /* 红色 */
-    --success: 142.1 76.2% 36.3%; /* 绿色 */
+    --sidebar-background: 42 30% 94%;
+    --sidebar-foreground: 222 30% 10%;
+    --sidebar-primary: 215 85% 28%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 42 35% 88%;
+    --sidebar-accent-foreground: 222 30% 10%;
+    --sidebar-border: 220 10% 48%;
+    --sidebar-ring: 215 90% 40%;
   }
 
   .dark {
-    /* 核心颜色 */
-    --background: 0 0% 10%;  /* 深灰 */
-    --foreground: 0 0% 100%; /* 白色 */
+    --background: 222 25% 10%;
+    --foreground: 42 30% 95%;
+    --card: 222 22% 14%;
+    --card-foreground: 42 30% 95%;
+    --popover: 222 22% 14%;
+    --popover-foreground: 42 30% 95%;
 
-    /* 边框和输入框 */
-    --border: 0 0% 20%;      /* 深灰边框 */
-    --input: 240 3.7% 15.9%; /* 暗灰输入框 */
+    --primary: 215 90% 78%;
+    --primary-foreground: 222 30% 10%;
 
-    /* 主要颜色 - 改为黑色 */
-    --primary: 0 0% 80%;     /* 暗黑色 */
-    --primary-foreground: 0 0% 10%;
+    --secondary: 222 18% 20%;
+    --secondary-foreground: 42 30% 95%;
+    --muted: 222 18% 18%;
+    --muted-foreground: 220 15% 78%;
+    --accent: 222 18% 24%;
+    --accent-foreground: 42 30% 95%;
 
-    /* 辅助色和柔和色 */
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 0 0% 20%;      /* 改为暗灰色悬停背景 */
-    --accent-foreground: 0 0% 100%;
+    --border: 220 10% 60%;
+    --input: 220 10% 60%;
+    --ring: 215 90% 70%;
 
-    /* 其他 */
-    --radius: 0.5rem;
-    --ring: 240 4.9% 83.9%;
+    --destructive: 0 80% 72%;
+    --destructive-foreground: 222 30% 10%;
+    --success: 142 60% 62%;
+    --success-foreground: 222 30% 10%;
 
-    /* 侧边栏样式 */
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 0 0% 20%; /* 改为黑色 */
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 0 0% 70%;  /* 改为灰色 */
-
-    /* 状态颜色 */
-    --destructive: 0 72% 51%; /* 暗红 */
-    --success: 142.1 70% 45%; /* 暗绿 */
+    --sidebar-background: 222 22% 12%;
+    --sidebar-foreground: 42 30% 95%;
+    --sidebar-primary: 215 90% 78%;
+    --sidebar-primary-foreground: 222 30% 10%;
+    --sidebar-accent: 222 18% 24%;
+    --sidebar-accent-foreground: 42 30% 95%;
+    --sidebar-border: 220 10% 60%;
+    --sidebar-ring: 215 90% 70%;
   }
 }
 
-@layer base {
-  body {
-    @apply bg-background text-foreground;
-  }
+/* Shared building blocks used by every game */
+@utility btn-big {
+  min-height: var(--target-min);
+  min-width: var(--target-min);
+  padding: 0.75rem 1.75rem;
+  font-size: var(--text-button);
+  font-weight: 700;
+  border-radius: var(--radius);
 }
-
-@layer base {
-  /* 仅在需要的元素上应用边框和轮廓 */
-  input, button, select {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
+@utility btn-destructive {
+  @apply bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))];
+}
+@utility btn-success {
+  @apply bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))];
 }
 
 /* Add combined match effect animation */
@@ -178,10 +199,4 @@
 .floating-image {
   animation: floatY 5s ease-in-out infinite;
   will-change: transform;
-}
-
-/* Prevent Google Auto Ads from breaking specific layouts or covering elements */
-.no-ads-inside ins.adsbygoogle,
-.no-ads-inside .google-auto-placed {
-  display: none !important;
 }

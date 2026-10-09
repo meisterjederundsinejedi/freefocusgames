@@ -1,145 +1,50 @@
-import { PanelLeft, Globe, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
-import { Sun, Moon } from "lucide-react"
-import { useTheme } from "next-themes"
-import { Link, usePathname, useRouter } from "@/i18n/navigation"
-import { useState } from "react"
-import { useLocale, useTranslations } from "next-intl"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+"use client";
 
-// 语言切换下拉菜单组件
-function LanguageSwitcher() {
-  const pathname = usePathname()
-  const locale = useLocale()
-  const [open, setOpen] = useState(false)
-  const t = useTranslations('common')
-  const router = useRouter()
-  
-  // 修改语言切换处理函数，在切换后刷新路由缓存
-  const handleLocaleChange = (newLocale: string) => {
-    setOpen(false)
-    
-    router.replace(pathname, { locale: newLocale })
-    // startTransition(() => {
-      // 先替换当前路径的语言
-      // 然后刷新路由缓存，确保语言设置正确传播
-      // router.refresh()
-    // })
-  }
-  
-  // 获取当前语言显示名称
-  const getLanguageDisplay = () => {
-    switch(locale) {
-      case 'zh': return '中文';
-      default: return 'English';
-    }
-  };
-  
-  return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="flex items-center gap-1 text-muted-foreground" aria-label={t('language')}>
-          <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">{getLanguageDisplay()}</span>
-          <ChevronDown className="h-3 w-3" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-background">
-        <DropdownMenuItem onSelect={() => handleLocaleChange('en')}>
-          English
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => handleLocaleChange('zh')}>
-          中文
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
+import { Home } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { routing } from "@/i18n/routing";
 
-export function Header({ onToggleSidebar }: { 
-  onToggleSidebar: () => void 
-}) {
-  const { theme, setTheme } = useTheme()
-  const t = useTranslations('common');
+const LANGUAGE_NAMES: Record<string, string> = {
+  de: "Deutsch",
+  en: "English",
+};
+
+/**
+ * Top bar shown on every screen.
+ * The big Home button is always in the same place (top left), also on the home screen.
+ */
+export function Header() {
+  const t = useTranslations("common");
+  const locale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
 
   return (
-    <header className="sticky z-50 top-0 bg-background/80 backdrop-blur-xs">
-      <div className="flex items-center h-16 px-4">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center">
-            <Image 
-              src="/logo.png" 
-              alt="logo"
-              width={32} 
-              height={32}
-              priority={true}
-            />
-            <span className="font-semibold text-foreground">
-                FreeFocusGames
-            </span>
+    <header className="sticky top-0 z-50 border-b-2 border-border bg-card">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-3">
+        <Button asChild size="lg">
+          <Link href="/" aria-label={t("home")}>
+            <Home aria-hidden="true" />
+            <span>{t("home")}</span>
           </Link>
-          <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground hidden md:inline-flex"
-              onClick={onToggleSidebar}
-              aria-label={t('toggleSidebar')}
-          >
-              <PanelLeft className="h-5 w-5" />
-          </Button>
-        </div>
-        <div className="flex-1" />
-        <div className="hidden md:flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          >
-            <Sun className="h-5 w-5 block dark:hidden" />
-            <Moon className="h-5 w-5 hidden dark:block" />
-            <span className="sr-only">{t('toggleTheme')}</span>
-          </Button>
-          
-          {/* 桌面端语言切换 */}
-          <LanguageSwitcher />
-        </div>
-        
-        {/* 移动端控件 */}
-        <div className="flex md:hidden items-center gap-2">
-          {/* 移动端语言切换 */}
-          <LanguageSwitcher />
-          
-          {/* 移动端主题切换 */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          >
-            <Sun className="h-5 w-5 block dark:hidden" />
-            <Moon className="h-5 w-5 hidden dark:block" />
-            <span className="sr-only">{t('toggleTheme')}</span>
-          </Button>
-          
-          {/* 移动端侧边栏切换 */}
-          <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground"
-              onClick={onToggleSidebar}
-              aria-label={t('toggleSidebar')}
-          >
-              <PanelLeft className="h-5 w-5" />
-          </Button>
-        </div>
+        </Button>
+
+        <nav aria-label={t("language")} className="flex items-center gap-3">
+          <span className="text-muted-foreground">{t("language")}:</span>
+          {routing.locales.map((code) => (
+            <Button
+              key={code}
+              variant={code === locale ? "default" : "outline"}
+              aria-pressed={code === locale}
+              onClick={() => router.replace(pathname, { locale: code })}
+            >
+              {LANGUAGE_NAMES[code] ?? code}
+            </Button>
+          ))}
+        </nav>
       </div>
     </header>
   );
-} 
+}

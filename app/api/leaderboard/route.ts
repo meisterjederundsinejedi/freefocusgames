@@ -17,18 +17,6 @@ import {
     calculateDoubleDecisionScore,
 } from "@/lib/double-decision-score";
 import {
-    DUAL_N_BACK_CLEAR_MAX_DURATION_MS,
-    DUAL_N_BACK_CLEAR_MAX_INTERVAL_MS,
-    DUAL_N_BACK_CLEAR_MAX_LEVEL,
-    DUAL_N_BACK_CLEAR_MAX_TRIALS,
-    DUAL_N_BACK_CLEAR_MIN_ACCURACY,
-    DUAL_N_BACK_CLEAR_MIN_DURATION_MS,
-    DUAL_N_BACK_CLEAR_MIN_INTERVAL_MS,
-    DUAL_N_BACK_CLEAR_MIN_LEVEL,
-    DUAL_N_BACK_CLEAR_MIN_TRIALS,
-    DUAL_N_BACK_CLEAR_TRAINING_MODE,
-} from "@/lib/dual-n-back-clear-rules";
-import {
     createEmptySnapshot,
     compareScores,
     getLeaderboardTarget,
@@ -227,61 +215,6 @@ function normalizeLeaderboardDetails(details: unknown) {
     }
 
     return Object.keys(normalized).length > 0 ? normalized : null;
-}
-
-function validateDualNBackClearDetails(score: number, details: LeaderboardSubmissionDetails | null) {
-    if (!details) {
-        return "Score rejected (Missing clear details)";
-    }
-
-    const level = toNumber(details.level, NaN);
-    const accuracy = toNumber(details.accuracy, NaN);
-    const durationMs = toNumber(details.durationMs, NaN);
-    const trialInterval = toNumber(details.trialInterval, NaN);
-    const trainingMode = typeof details.trainingMode === "string" ? details.trainingMode : "";
-    const trialsPerRound = toNumber(details.trialsPerRound, NaN);
-
-    if (trainingMode !== DUAL_N_BACK_CLEAR_TRAINING_MODE) {
-        return "Score rejected (Invalid clear mode)";
-    }
-
-    if (!Number.isInteger(level) || level < DUAL_N_BACK_CLEAR_MIN_LEVEL || level > DUAL_N_BACK_CLEAR_MAX_LEVEL) {
-        return "Score rejected (Invalid clear level)";
-    }
-
-    if (!Number.isInteger(accuracy) || accuracy < DUAL_N_BACK_CLEAR_MIN_ACCURACY || accuracy > 100) {
-        return "Score rejected (Invalid clear accuracy)";
-    }
-
-    if (
-        !Number.isInteger(trialsPerRound) ||
-        trialsPerRound < DUAL_N_BACK_CLEAR_MIN_TRIALS ||
-        trialsPerRound > DUAL_N_BACK_CLEAR_MAX_TRIALS
-    ) {
-        return "Score rejected (Invalid clear rounds)";
-    }
-
-    if (
-        !Number.isInteger(trialInterval) ||
-        trialInterval < DUAL_N_BACK_CLEAR_MIN_INTERVAL_MS ||
-        trialInterval > DUAL_N_BACK_CLEAR_MAX_INTERVAL_MS
-    ) {
-        return "Score rejected (Invalid clear pace)";
-    }
-
-    if (
-        !Number.isInteger(durationMs) ||
-        durationMs < DUAL_N_BACK_CLEAR_MIN_DURATION_MS ||
-        durationMs > DUAL_N_BACK_CLEAR_MAX_DURATION_MS
-    ) {
-        return "Score rejected (Invalid clear duration)";
-    }
-
-    if (Math.round(score) !== durationMs) {
-        return "Score rejected (Clear duration mismatch)";
-    }
-
-    return null;
 }
 
 function validateDoubleDecisionDetails(
@@ -506,22 +439,6 @@ function validateScore(
                 return "Score rejected (Outside expected performance range)";
             }
             return null;
-        case "dual-n-back":
-            if (mode === "standard-clear") {
-                if (!Number.isInteger(score) || score < 1000 || score > 600000) {
-                    return "Score rejected (Invalid clear duration)";
-                }
-
-                return validateDualNBackClearDetails(score, details);
-            }
-
-            if (mode === "standard-level") {
-                if (!Number.isInteger(score) || score < 1 || score > 10) {
-                    return "Score rejected (Invalid standard level)";
-                }
-                return null;
-            }
-            return "Score rejected (Unsupported dual n-back mode)";
         case "double-decision":
             return validateDoubleDecisionDetails(score, mode, details);
         case "bamboo-cicada":
@@ -601,92 +518,6 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "Missing or invalid parameters" }, { status: 400 });
         }
 
-        if (gameId === "dual-n-back" && mode === "standard-clear" && view === "recent") {
-            const hasDetailsColumn = await hasLeaderboardDetailsColumn(db);
-            const eligibilityWhereClause = hasDetailsColumn
-                ? `AND CAST(json_extract(details_json, '$.level') AS INTEGER) >= ?
-                   AND CAST(json_extract(details_json, '$.accuracy') AS INTEGER) >= ?
-                   AND (
-                       json_extract(details_json, '$.trialsPerRound') IS NULL
-                       OR CAST(json_extract(details_json, '$.trialsPerRound') AS INTEGER) >= ?
-                   )
-                   AND (
-                       json_extract(details_json, '$.trainingMode') IS NULL
-                       OR json_extract(details_json, '$.trainingMode') = ?
-                   )`
-                : `AND 1 = 0`;
-            const eligibilityBindings = hasDetailsColumn
-                ? [
-                    DUAL_N_BACK_CLEAR_MIN_LEVEL,
-                    DUAL_N_BACK_CLEAR_MIN_ACCURACY,
-                    DUAL_N_BACK_CLEAR_MIN_TRIALS,
-                    DUAL_N_BACK_CLEAR_TRAINING_MODE,
-                ]
-                : [];
-
-            const [recentRows, aggregateRow] = await Promise.all([
-                db.prepare(
-                    hasDetailsColumn
-                        ? `SELECT
-                            player_name AS playerName,
-                            score AS durationMs,
-                            created_at AS createdAt,
-                            details_json AS detailsJson
-                         FROM leaderboard
-                         WHERE game_id = ?
-                           AND mode = ?
-                           ${eligibilityWhereClause}
-                         ORDER BY datetime(created_at) DESC, id DESC
-                         LIMIT 20`
-                        : `SELECT
-                            player_name AS playerName,
-                            score AS durationMs,
-                            created_at AS createdAt,
-                            NULL AS detailsJson
-                         FROM leaderboard
-                         WHERE game_id = ?
-                           AND mode = ?
-                           ${eligibilityWhereClause}
-                         ORDER BY datetime(created_at) DESC, id DESC
-                         LIMIT 20`
-                ).bind(gameId, mode, ...eligibilityBindings).all(),
-                db.prepare(
-                    `SELECT
-                        COUNT(*) AS totalSubmissions,
-                        COALESCE(AVG(score), 0) AS averageDurationMs
-                     FROM leaderboard
-                     WHERE game_id = ?
-                       AND mode = ?
-                       ${eligibilityWhereClause}`
-                ).bind(gameId, mode, ...eligibilityBindings).first(),
-            ]);
-
-            const entries = recentRows.results.map((row) => {
-                const details = parseDetails(row.detailsJson);
-
-                return {
-                    playerName: String(row.playerName ?? "Anonymous"),
-                    durationMs: toNumber(row.durationMs),
-                    createdAt: String(row.createdAt ?? new Date().toISOString()),
-                    level: toNumber(details?.level, 0),
-                    accuracy: toNumber(details?.accuracy, 0),
-                };
-            });
-
-            return NextResponse.json(
-                {
-                    entries,
-                    totalSubmissions: toNumber(aggregateRow?.totalSubmissions),
-                    averageDurationMs: toNumber(aggregateRow?.averageDurationMs),
-                },
-                {
-                    headers: {
-                        "Cache-Control": "public, max-age=30, s-maxage=30, stale-while-revalidate=120",
-                    },
-                }
-            );
-        }
-
         let snapshot = await readSnapshot(bucket, gameId, mode);
 
         if (!snapshot) {
@@ -764,13 +595,9 @@ export async function POST(req: NextRequest) {
             }
         }
         const nowIso = new Date().toISOString();
-        const isDualNBackClear =
-            gameId === "dual-n-back" && mode === "standard-clear";
-        const scoreOrder = isDualNBackClear
-            ? "ASC"
-            : isHigherScoreBetter(gameId)
-                ? "DESC"
-                : "ASC";
+        const scoreOrder = isHigherScoreBetter(gameId)
+            ? "DESC"
+            : "ASC";
         const target = getLeaderboardTarget(gameId);
         const scoreOrderClause =
             typeof target === "number"
@@ -796,9 +623,7 @@ export async function POST(req: NextRequest) {
         const isFirstPlayer = previousBestScore === null;
         const isImprovedBest =
             previousBestScore !== null &&
-            (isDualNBackClear
-                ? score < previousBestScore
-                : isBetterScore(gameId, score, previousBestScore));
+            isBetterScore(gameId, score, previousBestScore);
         const shouldRecord = isFirstPlayer || isImprovedBest;
 
         const hasDetailsColumn = await hasLeaderboardDetailsColumn(db);
@@ -879,7 +704,7 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        if (shouldRecord && !(gameId === "dual-n-back" && mode === "standard-clear")) {
+        if (shouldRecord) {
             try {
                 const currentSnapshot = (await readSnapshot(bucket, gameId, mode)) ?? createEmptySnapshot(gameId, mode);
                 const nextSnapshot = updateSnapshotWithScore(
