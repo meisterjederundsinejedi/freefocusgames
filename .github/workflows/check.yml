@@ -30,7 +30,7 @@ jobs:
           test "$(cat /tmp/report/build.code)" = "0" || exit 0
           npm install --no-save --no-audit --no-fund playwright
           npx playwright install --with-deps chromium
-          npx next start -p 3000 > /tmp/report/server.txt 2>&1 &
+          python3 -m http.server 3000 --directory out > /tmp/report/server.txt 2>&1 &
           for i in $(seq 1 30); do curl -sf http://localhost:3000/ > /dev/null && break; sleep 1; done
           node .github/screenshots.mjs > /tmp/report/screenshots.txt 2>&1
       - name: Publish report to ci-report branch

@@ -8,11 +8,11 @@ const OUT = "/tmp/report/shots";
 mkdirSync(OUT, { recursive: true });
 
 const pages = [
-  ["home-de", "/"],
-  ["home-en", "/en"],
-  ["memory", "/games/memory-matching-game"],
-  ["zahlensuche", "/games/schulte-table"],
-  ["sudoku", "/games/focus-sudoku"],
+  ["home-de", "/de/"],
+  ["home-en", "/en/"],
+  ["memory", "/de/games/memory-matching-game/"],
+  ["zahlensuche", "/de/games/schulte-table/"],
+  ["sudoku", "/de/games/focus-sudoku/"],
 ];
 const sizes = [
   ["1280x720", { width: 1280, height: 720 }],
