@@ -12,9 +12,6 @@
     "build": "npm run generate-i18n && next build",
     "start": "next start",
     "lint": "next lint",
-    "preview": "npm run generate-i18n && opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "npm run generate-i18n && opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

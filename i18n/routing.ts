@@ -7,9 +7,8 @@ export const routing = defineRouting({
     // Used when no locale matches
     defaultLocale: "de",
 
-    // The default language needs no URL prefix (/ instead of /de)
-    localePrefix: "as-needed",
-    // A URL always serves the same language; the switcher changes the URL.
-    localeDetection: false,
+    // Static hosting has no middleware, so every page has its language in the URL
+    // (/de/..., /en/...). "/" is a tiny page (public/index.html) that goes to /de/.
+    localePrefix: "always",
     alternateLinks: false,
 });

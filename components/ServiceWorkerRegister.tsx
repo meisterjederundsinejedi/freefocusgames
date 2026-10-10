@@ -8,10 +8,9 @@ import { routing } from "@/i18n/routing";
 function pagesToKeep(): string[] {
   const urls: string[] = [];
   for (const locale of routing.locales) {
-    const prefix = locale === routing.defaultLocale ? "" : `/${locale}`;
-    urls.push(prefix || "/");
+    urls.push(`/${locale}/`);
     for (const game of getEnabledGames()) {
-      urls.push(`${prefix}${game.path}`);
+      urls.push(`/${locale}${game.path}/`);
     }
   }
   return urls;

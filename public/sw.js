@@ -86,7 +86,7 @@ async function networkFirst(request) {
     if (cached) return cached;
     if (request.mode === "navigate") {
       // A page we never saw, and no internet: show the start page instead of the browser's error.
-      const home = await cache.match("/");
+      const home = await cache.match("/de/");
       if (home) return home;
     }
     return new Response("Offline", { status: 503, headers: { "Content-Type": "text/plain" } });
