@@ -1,0 +1,20 @@
+FAILED home-de: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/
+Call log:
+  - navigating to "http://localhost:3000/", waiting until "networkidle"
+
+FAILED home-en: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/en
+Call log:
+  - navigating to "http://localhost:3000/en", waiting until "networkidle"
+
+FAILED memory: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/games/memory-matching-game
+Call log:
+  - navigating to "http://localhost:3000/games/memory-matching-game", waiting until "networkidle"
+
+FAILED zahlensuche: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/games/schulte-table
+Call log:
+  - navigating to "http://localhost:3000/games/schulte-table", waiting until "networkidle"
+
+FAILED sudoku: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/games/focus-sudoku
+Call log:
+  - navigating to "http://localhost:3000/games/focus-sudoku", waiting until "networkidle"
+

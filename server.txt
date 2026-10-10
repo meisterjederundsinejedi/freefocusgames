@@ -1,0 +1,6 @@
+   ▲ Next.js 15.2.8
+   - Local:        http://localhost:3000
+   - Network:      http://10.1.0.130:3000
+
+ ✓ Starting...
+[Error: "next start" does not work with "output: export" configuration. Use "npx serve@latest out" instead.]

@@ -1,0 +1,108 @@
+
+> freefocusgames@0.1.0 build
+> npm run generate-i18n && next build
+
+
+> freefocusgames@0.1.0 generate-i18n
+> node scripts/build-i18n-compiled.js
+
+Compiled i18n for en from 8 files
+Compiled i18n for de from 4 files
+   ▲ Next.js 15.2.8
+
+   Creating an optimized production build ...
+(node:2552) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/runner/work/freefocusgames/freefocusgames/tailwind.config.ts?id=1791623450635 is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/runner/work/freefocusgames/freefocusgames/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+./app/[locale]/(main)/games/schulte-table/components/SchulteGame.tsx
+66:6  Warning: React Hook useEffect has a missing dependency: 'initializeGrid'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/44) ...
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+   Generating static pages (11/44) 
+   Generating static pages (22/44) 
+   Generating static pages (33/44) 
+ ✓ Generating static pages (44/44)
+   Finalizing page optimization ...
+   Collecting build traces ...
+   Exporting (0/3) ...
+ ✓ Exporting (3/3)
+
+Route (app)                                         Size  First Load JS
+┌ ○ /_not-found                                    981 B         102 kB
+├ ● /[locale]                                      195 B         125 kB
+├   ├ /de
+├   └ /en
+├ ● /[locale]/games/baby-animal-matching         2.91 kB         118 kB
+├   ├ /de/games/baby-animal-matching
+├   └ /en/games/baby-animal-matching
+├ ● /[locale]/games/bamboo-cicada                2.28 kB         118 kB
+├   ├ /de/games/bamboo-cicada
+├   └ /en/games/bamboo-cicada
+├ ● /[locale]/games/block-memory-challenge       5.55 kB         143 kB
+├   ├ /de/games/block-memory-challenge
+├   └ /en/games/block-memory-challenge
+├ ● /[locale]/games/challenge-10-seconds         6.91 kB         187 kB
+├   ├ /de/games/challenge-10-seconds
+├   └ /en/games/challenge-10-seconds
+├ ● /[locale]/games/digit-span-test               6.4 kB         144 kB
+├   ├ /de/games/digit-span-test
+├   └ /en/games/digit-span-test
+├ ● /[locale]/games/double-decision              9.08 kB         143 kB
+├   ├ /de/games/double-decision
+├   └ /en/games/double-decision
+├ ● /[locale]/games/fish-trace                   2.92 kB         118 kB
+├   ├ /de/games/fish-trace
+├   └ /en/games/fish-trace
+├ ● /[locale]/games/focus-reaction-test          8.79 kB         178 kB
+├   ├ /de/games/focus-reaction-test
+├   └ /en/games/focus-reaction-test
+├ ● /[locale]/games/focus-sudoku                  6.7 kB         144 kB
+├   ├ /de/games/focus-sudoku
+├   └ /en/games/focus-sudoku
+├ ● /[locale]/games/free-short-term-memory-test  6.51 kB         139 kB
+├   ├ /de/games/free-short-term-memory-test
+├   └ /en/games/free-short-term-memory-test
+├ ● /[locale]/games/frog-memory-leap             2.91 kB         118 kB
+├   ├ /de/games/frog-memory-leap
+├   └ /en/games/frog-memory-leap
+├ ● /[locale]/games/larger-number                2.88 kB         118 kB
+├   ├ /de/games/larger-number
+├   └ /en/games/larger-number
+├ ● /[locale]/games/memory-matching-game         2.85 kB         118 kB
+├   ├ /de/games/memory-matching-game
+├   └ /en/games/memory-matching-game
+├ ● /[locale]/games/peripheral-speed-training      139 B         101 kB
+├   ├ /de/games/peripheral-speed-training
+├   └ /en/games/peripheral-speed-training
+├ ● /[locale]/games/reaction-time                3.77 kB         184 kB
+├   ├ /de/games/reaction-time
+├   └ /en/games/reaction-time
+├ ● /[locale]/games/rotating-schulte-table       3.64 kB         140 kB
+├   ├ /de/games/rotating-schulte-table
+├   └ /en/games/rotating-schulte-table
+├ ● /[locale]/games/schulte-table                3.55 kB         150 kB
+├   ├ /de/games/schulte-table
+├   └ /en/games/schulte-table
+├ ● /[locale]/games/stroop-effect-test           7.97 kB         188 kB
+├   ├ /de/games/stroop-effect-test
+├   └ /en/games/stroop-effect-test
+└ ● /[locale]/games/trail-making-test            8.47 kB         132 kB
+    ├ /de/games/trail-making-test
+    └ /en/games/trail-making-test
++ First Load JS shared by all                     101 kB
+  ├ chunks/1684-d73af13a1fb49da7.js              45.4 kB
+  ├ chunks/4bd1b696-633779c18a58813e.js          53.3 kB
+  └ other shared chunks (total)                  2.21 kB
+
+
+○  (Static)  prerendered as static content
+●  (SSG)     prerendered as static HTML (uses generateStaticParams)
+
